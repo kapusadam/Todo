@@ -4,9 +4,8 @@
     <div class="right"><button class="add-new-note " ng-click="addNewNote()">+</button></div>
     <div class="clear"></div>
 </div>
-<ul>
-    <li class="tag" ng-repeat="tag in tags"><my-tag my-item="tag" note-id="{{item._id}}" ></my-tag></li>
-</ul>
+
+<tags note-id="{{item._id}}" tags="tags"></tags noteId>
 
 <div class="color-picker">
     <color-block ng-repeat="color in colors"  class="color" bg-color="{{color}}" ng-click="changeColor(color)"></color-block>

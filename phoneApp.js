@@ -7,7 +7,7 @@ var app = angular
 
 app.constant('NOTE_URL', 'http://localhost:3000/note?fn=');
 app.constant('TAG_URL', 'http://localhost:3000/tag?fn=');
-app.value('notes', []);
+
 function config($routeProvider) {
     $routeProvider
         .when('/', {
@@ -25,50 +25,77 @@ function config($routeProvider) {
         });
 }
 
-app.controller("AppCtrl", function(noteService, tagService, notes, tags) {
+app.controller("AppCtrl", function(noteService, tagService, notes, tags, $scope) {
     notes = JSON.parse(notes);
     tags = JSON.parse(tags);
 
     var appctrl = this;
     appctrl.toggle = false;
-    appctrl.notes = notes;
-    appctrl.tags = tags;
+    $scope.notes = notes;
+    $scope.allTags = tags;
+
 
     if(notes.length == 0) {
         var promise = noteService.createNote("New note");
         promise.then(function(note) {
-            $scope.$parent.$parent.appctrl.notes.push(note)
+            $scope.notes.push(note)
         });
+    }
+});
+
+app.directive("notes", function(noteService) {
+    return {
+        templateUrl: "templates/notes.html",
+        restrict: "E",
+        scope: {
+            "notes":"=",
+            "tages":"="
+        },
+        controller: function($scope) {
+
+            $scope.changeColor = function (color) {
+                var promise = noteService.updateNote(this.item._id, null, color);
+                promise.then(function(x) {
+                    $element.css("background-color", color);
+                    //$scope.$parent.$parent.appctrl.toggle = true;
+                    $timeout(function() {
+                        // $scope.$parent.$parent.appctrl.toggle = false;
+                    },1000);
+                });
+            };
+            $scope.addNewNote = function() {
+                var promise = noteService.createNote("New note");
+                promise.then(function(note) {
+
+                    $scope.notes.push(note)
+                });
+
+            };
+            $scope.getTags = function() {
+                return $scope.tages;
+            }
+        }
     }
 });
 
 app.directive("myNote", function(noteService, tagService, $timeout) {
     return {
         restrict : 'E',
+        require: '^notes',
+
         scope: {
             item: '=myNote',
-            saveNote:"&",
-            changeColor:"&",
-            noteId: "@"
+            tageees: '=',
+            addNewNote: '&',
+            saveNotes:"&",
+            getTags:"&",
+            //changeColor:"&",
+            note:"=",
+            noteId: "@",
+            notes: "="
         },
         templateUrl: 'templates/note.html',
         controller: function($scope, $element) {
-            $scope.addNewNote = function() {
-                var promise = noteService.createNote("New note");
-                promise.then(function(note) {
-                    $scope.$parent.$parent.appctrl.notes.push(note)
-                });
-            };
-            $scope.changeColor = function (color) {
-                var promise = noteService.updateNote(this.item._id, null, color);
-                promise.then(function(x) {
-                    $element.css("background-color", color);
-                    $scope.$parent.$parent.appctrl.toggle = true;
-                    $timeout(function() {
-                        $scope.$parent.$parent.appctrl.toggle = false;
-                    },1000)
-                });
-            };
             $scope.changeNoteTitle = function(title, $event) {
                 if($event && $event.which != 13) {
                     return;
@@ -87,64 +114,119 @@ app.directive("myNote", function(noteService, tagService, $timeout) {
                 promise.then(function() {
                     $element.remove();
                 });
-            }
+            };
 
+
+            var tags = $scope.getTags();
             $scope.newTag = "Enter new tag";
             $scope.colors = ["#ff00ff", "#fff000" , "#0000ff", "#00ffff", "#ff0000", "#00ff00"];
+
             $scope.tags = [{description:"Add new tag"}];
 
-            _.each($scope.$parent.$parent.appctrl.tags, function(tag) {
+            _.each(tags, function(tag) {
                 if(tag.noteId == $scope.noteId) {
                     $scope.tags.push(tag) ;
                 }
             });
 
         },
-        link: function($scope, element, attrs) {
-            element.css("background-color", attrs.noteColor).css("top", $scope.item.posY+"px").css("left", $scope.item.posX+"px");
+        link: function(scope, element, attrs, ctrls) {
+            console.log(ctrls);
+
+            element.css("background-color", attrs.noteColor).css("top", scope.item.posY+"px").css("left", scope.item.posX+"px");
         }
 
     };
 });
 
-app.directive("myTag", function(tagService, $timeout) {
+
+app.directive("tags", function(noteService, tagService) {
     return {
+        templateUrl: "templates/tags.html",
         restrict: "E",
-        templateUrl: "templates/tag.html",
         scope: {
-            item: '=myItem',
-            test1:'&',
-            noteId:'@'
+            tags: "=",
+            noteId:"@"
         },
         controller: function($scope, $element) {
-            $scope.changeTag = function(newTag, $event) {
-                debugger;
-               if($event && $event.which != 13) {
-                   return;
-               }
-               if(newTag._id) {
+            $scope.changeTag = function( newTag, $event) {
+
+
+                if($event && $event.which != 13) {
+                    return;
+                } debugger;
+
+                if(newTag._id) {
                     var promise = tagService.updateTag(newTag._id, newTag.description, newTag.isDone);
-                   promise.then(function() {
-                       $scope.$parent.$parent.$parent.appctrl.toggle = true;
-                       $timeout(function() {
-                           $scope.$parent.$parent.$parent.appctrl.toggle = false;
-                       },1000);
-                   })
+                    promise.then(function() {
+                        // $scope.$parent.$parent.$parent.appctrl.toggle = true;
+                       // $timeout(function() {
+                            // $scope.$parent.$parent.$parent.appctrl.toggle = false;
+                        //},1000);
+                    })
                 }
                 else {
                     var tagObj = {noteId: $scope.noteId, description:newTag.description };
                     var that = this;
+
                     var promise = tagService.createTag(tagObj.noteId, tagObj.description);
                     promise.then(function(result) {
                         tagObj._id = result._id;
-                        that.$parent.$parent.tags.push(tagObj);
-                        $scope.$parent.$parent.$parent.appctrl.toggle = true;
-                        $timeout(function() {
-                            $scope.$parent.$parent.$parent.appctrl.toggle = false;
-                        },1000);
+                        debugger;
+                        $scope.tags.push(tagObj);
+                        //  $scope.$parent.$parent.$parent.appctrl.toggle = true;
+                        //$timeout(function() {
+                            // $scope.$parent.$parent.$parent.appctrl.toggle = false;
+                      //  },1000);
                     })
                 }
             };
+
+            $scope.deleteTag = function(tag) {
+                return tagService.deleteTag(tag._id);
+            };
+
+            $scope.removeElementFromList = function(tag) {
+                var index = $scope.tags.indexOf(tag);
+                $scope.tags = _.without( $scope.tags, _.findWhere( $scope.tags, {id: index}));
+            }
+
+            $scope.changeTagDone = function(tag) {
+                debugger;
+
+                return tagService.updateTag(tag._id, tag.description, tag.isDone);
+            };
+        }
+    }
+});
+
+app.directive("myTag", function($timeout) {
+    return {
+        restrict: "E",
+        templateUrl: "templates/tag.html",
+        require:'^tags',
+        scope: {
+            item: '=myItem',
+            test1:'&',
+            noteId:'@',
+            changeTag:'=',
+            deleteTag:'=',
+            removeElementFromList:'&',
+            changeTagDone:'=',
+            tags:"="
+        },
+        controller: function($scope, $element) {
+            $scope.deleteMyTag = function(tag) {
+                var promise = $scope.deleteTag(tag);
+                promise.then(function() {
+                    $scope.removeElementFromList(tag);
+                    $element.remove();
+                    //$scope.$parent.$parent.$parent.appctrl.toggle = true;
+                    //$timeout(function() {
+                    //    $scope.$parent.$parent.$parent.appctrl.toggle = false;
+                    //},1000);
+                })
+            }
             $scope.tagFocus = function(tag) {
                 if(!tag._id) {
                     tag.description = "";
@@ -155,21 +237,25 @@ app.directive("myTag", function(tagService, $timeout) {
                     tag.description = "Add new tag";
                 }
             };
-            $scope.deleteTag = function(tag) {
-                var promise = tagService.deleteTag(tag._id);
-                var that = this;
-                promise.then(function() {
-                    var index = that.$parent.$parent.tags.indexOf(tag);
-                    that.$parent.$parent.tags = _.without( that.$parent.$parent.tags, _.findWhere( that.$parent.$parent.tags, {id: index}));
-                    $element.remove();
-                    $scope.$parent.$parent.$parent.appctrl.toggle = true;
-                    $timeout(function() {
-                        $scope.$parent.$parent.$parent.appctrl.toggle = false;
-                    },1000);
-                })
-            };
-            $scope.changeTagDone = function(tag) {
+
+            $scope.changeMyTagDone = function(tag) {
+
                 tag.isDone = tag.isDone == "true" ? true : false;
+                var checked = !tag.isDone;
+                var promise = $scope.changeTagDone(tag);
+
+                promise.then(function() {
+                    $element.remove();
+                    if(checked) {
+                        $element.parent().addClass("isDone");
+                    }
+                    else{
+                        $element.parent().removeClass("isDone");
+                    }
+                })
+
+
+               /* tag.isDone = tag.isDone == "true" ? true : false;
                 var checked = !tag.isDone;
                 var promise = tagService.updateTag(tag._id, tag.description, checked);
                 promise.then(function() {
@@ -183,12 +269,12 @@ app.directive("myTag", function(tagService, $timeout) {
                     else{
                         $element.parent().removeClass("isDone");
                     }
-                    for(var i = 0;i<$scope.$parent.$parent.tags.length;++i) {
-                        if($scope.$parent.$parent.tags[i]._id == tag._id) {
-                            $scope.$parent.$parent.tags[i].isDone = checked ? "true" : "false";
+                    for(var i = 0;i<$scope.tags.length;++i) {
+                        if($scope.tags[i]._id == tag._id) {
+                            $scope.tags[i].isDone = checked ? "true" : "false";
                         }
                     }
-                })
+                })*/
             };
         },
         link: function($scope, element) {
