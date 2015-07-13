@@ -35,7 +35,10 @@ app.controller("AppCtrl", function(noteService, tagService, notes, tags) {
     appctrl.tags = tags;
 
     if(notes.length == 0) {
-        noteService.createNote("My new note");
+        var promise = noteService.createNote("New note");
+        promise.then(function(note) {
+            $scope.$parent.$parent.appctrl.notes.push(note)
+        });
     }
 });
 
@@ -53,7 +56,6 @@ app.directive("myNote", function(noteService, tagService, $timeout) {
             $scope.addNewNote = function() {
                 var promise = noteService.createNote("New note");
                 promise.then(function(note) {
-                    debugger;
                     $scope.$parent.$parent.appctrl.notes.push(note)
                 });
             };
