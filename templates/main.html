@@ -1,0 +1,5 @@
+<my-note my-draggable class="note" ng-repeat="note in appctrl.notes" my-note="note" note-color="{{note.color}}" note-id="{{note._id}}"></my-note>
+
+<div class="alert-div toggle" ng-if="appctrl.toggle">
+    Successful modifcation
+</div>

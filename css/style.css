@@ -1,0 +1,111 @@
+.note {
+    width: 300px;
+    background-color: aliceblue;
+    position: absolute !important;
+}
+.note:hover {
+    cursor: pointer;
+}
+.note > h3 > span >input {
+    text-align: center;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-size: 20px;
+    height: 100%;
+}
+.note li > span {
+    display: inline-block;
+}
+
+.note .checkbox-wrapper {
+    position: absolute;
+    right: 0px;
+}
+.note-header div{
+    display: inline-block;
+}
+.container {right: 0; text-align: center;}
+
+.container .left, .container .center, .container .right { display: inline-block; }
+
+.container .left { float: left; }
+.container .center { margin: 0 auto; }
+ .right { float: right; }
+.clear { clear: both; }
+.title-wrapper input {
+
+    text-align: center;
+    font-size: 16px;
+}
+.add-new-note:hover {
+    cursor: pointer;
+}
+.tag {
+    margin: 15px 25px 15px 5px;
+}
+.description, .title-wrapper > input {
+    background-color: transparent;
+    border: 0px solid;
+    height: 20px;
+    width: 160px;
+    color: #000000;
+    outline: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.color-picker {
+    text-align: center;
+}
+.color-picker > .color {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    margin: 20px 10px;
+}
+.color-picker > .color:hover {
+    cursor: pointer;
+}
+.description:hover, .delete-tag:hover, .isDoneCheckBox:hover{
+    cursor: pointer;
+}
+.isDone{
+    background-position-y: -19px;
+    text-decoration: none;
+    background-image: linear-gradient(transparent 7px,#cc1f1f 7px,#cc1f1f 9px,transparent 9px);
+}
+.alert-div {
+    width: 100px;
+    height: 40px;
+    position: absolute;
+    background: rgba(0, 255, 55, 0.5);
+    color: white;
+    text-align: center;
+    display: inline-block;
+    left: 180px;
+    padding: 10px;
+}
+.toggle {
+    -webkit-transition: linear 1s;
+    -moz-transition: linear 1s;
+    -ms-transition: linear 1s;
+    -o-transition: linear 1s;
+    transition: linear 1s;
+}
+
+.toggle.ng-enter {
+    opacity: 0;
+}
+
+.toggle.ng-enter-active {
+    opacity: 1;
+}
+
+.toggle.ng-leave {
+    opacity: 1;
+}
+
+.toggle.ng-leave-active {
+    opacity: 0;
+}

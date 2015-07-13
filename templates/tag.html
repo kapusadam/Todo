@@ -1,0 +1,7 @@
+<div>
+    <span class="description-wrapper">
+        <input class="description" ng-model="item.description" ng-blur="tagBlur(item)" ng-click="tagFocus(item)" ng-keypress="changeTag(item, $event)" />
+    </span>
+    <span ng-show="item._id" class="checkbox-wrapper"><input class="isDoneCheckBox" ng-checked="{{item.isDone}}" ng-click="changeTagDone(item)" type="checkbox"></span>
+    <span class="delete-tag" ng-show="item._id" ng-click="deleteTag(item)">Delete</span>
+</div>
