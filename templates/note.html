@@ -8,5 +8,5 @@
 <tags note-id="{{item._id}}" tags="tags"></tags noteId>
 
 <div class="color-picker">
-    <color-block ng-repeat="color in colors"  class="color" bg-color="{{color}}" ng-click="changeColor(color)"></color-block>
+    <color-block ng-repeat="color in colors" class="color" change-color="changeColor()" bg-color="{{color}}" ng-click="changeNoteColor(color)"></color-block>
 </div>

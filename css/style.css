@@ -109,3 +109,9 @@
 .toggle.ng-leave-active {
     opacity: 0;
 }
+.alert-normal {
+     background-color: #b5ff12;
+ }
+.alert-error {
+    background-color: #ff0021;
+}

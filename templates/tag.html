@@ -3,6 +3,8 @@
         <input class="description" ng-model="item.description" ng-blur="tagBlur(item)"
                ng-click="tagFocus(item)" ng-keypress="changeTag(item, $event)" />
     </span>
-    <!--<span ng-show="item._id" class="checkbox-wrapper"><input class="isDoneCheckBox" ng-checked="{{item.isDone}}" ng-click="changeMyTagDone(item)" type="checkbox"></span>-->
+    <span ng-show="item._id" class="checkbox-wrapper">
+        <input class="isDoneCheckBox" ng-checked="{{item.isDone}}" ng-click="changeMyTagDone(item)" type="checkbox">
+    </span>
     <span class="delete-tag" ng-show="item._id" ng-click="deleteMyTag(item)">Delete</span>
 </div>
